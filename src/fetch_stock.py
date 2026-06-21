@@ -18,4 +18,16 @@ df = client.get_eq_bars_daily(
     to_yyyymmdd=to_date,
 )
 
-print(df.tail(10))
+latest_10 = df.tail(10)
+
+print("=== トヨタ自動車（7203）の株価 ===")
+
+for _, row in latest_10.iterrows():
+    print(f"""
+日付: {row["Date"].date()}
+始値: {row["O"]} 円
+高値: {row["H"]} 円
+安値: {row["L"]} 円
+終値: {row["C"]} 円
+------------------------
+""")
