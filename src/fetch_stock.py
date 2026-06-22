@@ -1,29 +1,33 @@
 from dotenv import load_dotenv
-
 from jquantsapi import ClientV2
 
 
 load_dotenv()
 
-client = ClientV2()
+
+def fetch_stock_data(code):
+
+    client = ClientV2()
+
+    from_date = "20260315"
+    to_date = "20260329"
+
+    df = client.get_eq_bars_daily(
+        code=code,
+        from_yyyymmdd=from_date,
+        to_yyyymmdd=to_date,
+    )
+
+    return df.tail(10)
 
 
-from_date = "20260315"
-to_date = "20260329"
+def display_stock_data(df, code):
 
+    print(f"=== 株価情報({code}) ===")
 
-df = client.get_eq_bars_daily(
-    code="7203",
-    from_yyyymmdd=from_date,
-    to_yyyymmdd=to_date,
-)
+    for _, row in df.iterrows():
 
-latest_10 = df.tail(10)
-
-print("=== トヨタ自動車（7203）の株価 ===")
-
-for _, row in latest_10.iterrows():
-    print(f"""
+        print(f"""
 日付: {row["Date"].date()}
 始値: {row["O"]} 円
 高値: {row["H"]} 円
@@ -31,3 +35,16 @@ for _, row in latest_10.iterrows():
 終値: {row["C"]} 円
 ------------------------
 """)
+
+
+def main():
+
+    stock_code = [code.strip() for code in input().split(',')]
+
+    for code in stock_code:
+        df = fetch_stock_data(code)
+        display_stock_data(df, code)
+
+
+if __name__ == "__main__":
+    main()
