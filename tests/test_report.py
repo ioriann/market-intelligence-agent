@@ -29,17 +29,28 @@ multi_day_data = pd.DataFrame({
     "C": [1050, 1100, 900],
 })
 
+fractional_price_data = pd.DataFrame({
+    "Date": [pd.Timestamp("2026-03-27")],
+    "O": [971.5],
+    "H": [980.25],
+    "L": [960.1],
+    "C": [975.33],
+})
 
+
+# データ1件だけでもレポートの見出し（会社名・銘柄コード）が正しく作られるかを確認する
 def test_create_stock_report():
     report = create_stock_report(company_info, stock_data)
     assert "# テスト株式会社 (1234)" in report
 
 
+# 複数日のデータを渡したとき、「作成日」に一番古い日付ではなく最新日が使われるかを確認する
 def test_create_stock_report_uses_latest_date_as_created_date():
     report = create_stock_report(company_info, multi_day_data)
     assert "作成日: 2026-03-27" in report
 
 
+# 期間サマリー（最高値・最安値・騰落率）の計算式そのものが正しいかを確認する
 def test_create_stock_report_summary_reflects_period_high_low_and_change_rate():
     report = create_stock_report(company_info, multi_day_data)
     # 期間最高値=1200, 期間最安値=950
@@ -49,11 +60,20 @@ def test_create_stock_report_summary_reflects_period_high_low_and_change_rate():
     assert "騰落率: -14.29%" in report
 
 
+# 4桁以上の価格がカンマ区切り＋「円」表記でテーブルに出力されるかを確認する
 def test_create_stock_report_formats_prices_with_comma_and_yen():
     report = create_stock_report(company_info, multi_day_data)
     assert "| 1,000円 | 1,100円 | 950円 | 1,050円 |" in report
 
 
+# 株価に小数が含まれる場合、四捨五入で丸めずそのまま表示するかを確認する
+# （調整後株価など、株価が整数円になるとは限らないケースがあるため）
+def test_create_stock_report_does_not_round_fractional_prices():
+    report = create_stock_report(company_info, fractional_price_data)
+    assert "| 971.5円 | 980.25円 | 960.1円 | 975.33円 |" in report
+
+
+# 企業情報が取得できず「(不明)」のときも、例外を起こさずレポートを生成できるかを確認する
 def test_create_stock_report_missing_company_info_falls_back():
     incomplete_info = {"code": "9999", "name": "(不明)", "market": "(不明)", "sector": "(不明)"}
     report = create_stock_report(incomplete_info, stock_data)
@@ -61,6 +81,8 @@ def test_create_stock_report_missing_company_info_falls_back():
     assert "- 市場: (不明)" in report
 
 
+# save_stock_report() が reports/ に正しいファイル名・内容でファイルを書き出すかを確認する
+# （本番のreports/を汚さないよう、tmp_pathで作った一時ディレクトリに移動してから実行する）
 def test_save_stock_report_writes_expected_file(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / "reports").mkdir()

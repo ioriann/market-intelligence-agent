@@ -23,8 +23,8 @@ def create_stock_report(company_info, stock_data):
 
     report += "## 期間サマリー\n\n"
     report += f"- 期間: {earliest_date.date()} 〜 {latest_date.date()}\n"
-    report += f"- 期間最高値: {highest:,.0f}円\n"
-    report += f"- 期間最安値: {lowest:,.0f}円\n"
+    report += f"- 期間最高値: {highest:,}円\n"
+    report += f"- 期間最安値: {lowest:,}円\n"
     report += f"- 騰落率: {change_rate:+.2f}%\n\n"
 
     report += "## 株価データ\n\n"
@@ -35,10 +35,10 @@ def create_stock_report(company_info, stock_data):
     for _, row in sorted_data.iterrows():
         report += (
             f"| {row['Date'].date()} "
-            f"| {row['O']:,.0f}円 "
-            f"| {row['H']:,.0f}円 "
-            f"| {row['L']:,.0f}円 "
-            f"| {row['C']:,.0f}円 |\n"
+            f"| {row['O']:,}円 "
+            f"| {row['H']:,}円 "
+            f"| {row['L']:,}円 "
+            f"| {row['C']:,}円 |\n"
         )
 
     return report
