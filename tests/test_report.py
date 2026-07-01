@@ -81,6 +81,25 @@ def test_create_stock_report_missing_company_info_falls_back():
     assert "- 市場: (不明)" in report
 
 
+# ニュースが渡されたとき、タイトル・リンク・日時がMarkdownリンク形式で欄に出るかを確認する
+def test_create_stock_report_includes_news_section_when_news_present():
+    news = [
+        {"title": "テスト社が新製品を発表", "link": "https://example.com/1", "published": "Mon, 29 Jun 2026 13:00:00 GMT"},
+    ]
+    report = create_stock_report(company_info, stock_data, news)
+    assert "## 関連ニュース" in report
+    assert "- [テスト社が新製品を発表](https://example.com/1) （Mon, 29 Jun 2026 13:00:00 GMT）" in report
+
+
+# ニュースが空/未指定のとき、関連ニュース欄自体が出ないことを確認する
+def test_create_stock_report_omits_news_section_when_no_news():
+    report = create_stock_report(company_info, stock_data)
+    assert "## 関連ニュース" not in report
+
+    report_with_empty_list = create_stock_report(company_info, stock_data, news=[])
+    assert "## 関連ニュース" not in report_with_empty_list
+
+
 # save_stock_report() が reports/ に正しいファイル名・内容でファイルを書き出すかを確認する
 # （本番のreports/を汚さないよう、tmp_pathで作った一時ディレクトリに移動してから実行する）
 def test_save_stock_report_writes_expected_file(tmp_path, monkeypatch):

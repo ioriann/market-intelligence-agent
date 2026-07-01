@@ -1,4 +1,4 @@
-def create_stock_report(company_info, stock_data):
+def create_stock_report(company_info, stock_data, news=None):
 
     sorted_data = stock_data.sort_values("Date")
 
@@ -26,6 +26,12 @@ def create_stock_report(company_info, stock_data):
     report += f"- 期間最高値: {highest:,}円\n"
     report += f"- 期間最安値: {lowest:,}円\n"
     report += f"- 騰落率: {change_rate:+.2f}%\n\n"
+
+    if news:
+        report += "## 関連ニュース\n\n"
+        for item in news:
+            report += f"- [{item['title']}]({item['link']}) （{item['published']}）\n"
+        report += "\n"
 
     report += "## 株価データ\n\n"
 

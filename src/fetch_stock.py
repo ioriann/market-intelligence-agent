@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from jquantsapi import ClientV2
 from report import create_stock_report, save_stock_report
+from news import fetch_stock_news
 
 load_dotenv()
 
@@ -106,8 +107,9 @@ def main():
     for code in stock_code:
         stock_data = fetch_stock_data(client, code)
         company_info = fetch_company_info(client, code)
+        news = fetch_stock_news(company_info["name"])
         display_result(stock_data, company_info)
-        report = create_stock_report(company_info, stock_data)
+        report = create_stock_report(company_info, stock_data, news)
         save_stock_report(report, code, stock_data)
 
 if __name__ == "__main__":
