@@ -1,6 +1,16 @@
 def create_stock_report(company_info, stock_data):
 
-    latest_date = stock_data["Date"].max()
+    sorted_data = stock_data.sort_values("Date")
+
+    earliest_date = sorted_data["Date"].min()
+    latest_date = sorted_data["Date"].max()
+
+    first_close = sorted_data.iloc[0]["C"]
+    last_close = sorted_data.iloc[-1]["C"]
+    change_rate = (last_close - first_close) / first_close * 100
+
+    highest = sorted_data["H"].max()
+    lowest = sorted_data["L"].min()
 
     report = f"# {company_info['name']} ({company_info['code']})\n\n"
 
@@ -11,18 +21,24 @@ def create_stock_report(company_info, stock_data):
     report += f"- 市場: {company_info['market']}\n"
     report += f"- 業種: {company_info['sector']}\n\n"
 
+    report += "## 期間サマリー\n\n"
+    report += f"- 期間: {earliest_date.date()} 〜 {latest_date.date()}\n"
+    report += f"- 期間最高値: {highest:,.0f}円\n"
+    report += f"- 期間最安値: {lowest:,.0f}円\n"
+    report += f"- 騰落率: {change_rate:+.2f}%\n\n"
+
     report += "## 株価データ\n\n"
 
     report += "| 日付 | 始値 | 高値 | 安値 | 終値 |\n"
     report += "| --- | --- | --- | --- | --- |\n"
 
-    for _, row in stock_data.iterrows():
+    for _, row in sorted_data.iterrows():
         report += (
             f"| {row['Date'].date()} "
-            f"| {row['O']} "
-            f"| {row['H']} "
-            f"| {row['L']} "
-            f"| {row['C']} |\n"
+            f"| {row['O']:,.0f}円 "
+            f"| {row['H']:,.0f}円 "
+            f"| {row['L']:,.0f}円 "
+            f"| {row['C']:,.0f}円 |\n"
         )
 
     return report
