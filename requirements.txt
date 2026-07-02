@@ -2,3 +2,4 @@ jquants-api-client
 python-dotenv
 pandas
 feedparser
+openai

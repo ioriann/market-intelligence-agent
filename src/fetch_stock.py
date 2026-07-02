@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from jquantsapi import ClientV2
 from report import create_stock_report, save_stock_report
 from news import fetch_stock_news
+from ai_analysis import analyze_market_data
 
 load_dotenv()
 
@@ -111,6 +112,7 @@ def main():
         display_result(stock_data, company_info)
         report = create_stock_report(company_info, stock_data, news)
         save_stock_report(report, code, stock_data)
+        analysis_result = analyze_market_data(report)
 
 if __name__ == "__main__":
     main()
