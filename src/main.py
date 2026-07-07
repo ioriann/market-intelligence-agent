@@ -22,8 +22,11 @@ def main():
         report = create_stock_report(company_info, stock_data, news)
         save_stock_report(report, code, stock_data)
         analysis_result = analyze_market_data(report)
-        print("=== AI分析結果 ===")
-        print(analysis_result)
+        if analysis_result is None:
+            print("AI分析中にエラーが発生しました。")
+        else:
+            print("=== AI分析結果 ===")
+            print(analysis_result)
 
 if __name__ == "__main__":
     main()

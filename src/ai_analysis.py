@@ -20,5 +20,4 @@ def analyze_market_data(markdown):
         return analysis_result
     except openai.APIError as e:
         print(f"Error occurred: {e}")
-        analysis_result = "分析中にエラーが発生しました。"
-        return analysis_result
+        return None

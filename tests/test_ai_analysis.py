@@ -21,8 +21,8 @@ class FakeOpenAI:
         self.chat = FakeChat()
 
 
-# APIが失敗したとき、クラッシュせずフォールバック文字列が返ることを確認する
+# APIが失敗したとき、クラッシュせずNoneが返ることを確認する
 def test_analyze_market_data_returns_fallback_on_api_error(monkeypatch):
     monkeypatch.setattr(ai_analysis, "OpenAI", FakeOpenAI)
     result = ai_analysis.analyze_market_data("ダミーレポート")
-    assert result == "分析中にエラーが発生しました。"
+    assert result is None
