@@ -1,6 +1,6 @@
 def fetch_stock_data(client, code):
 
-    from_date = "20260315"
+    from_date = "20250929"
     to_date = "20260329"
 
     df = client.get_eq_bars_daily(
@@ -9,7 +9,7 @@ def fetch_stock_data(client, code):
         to_yyyymmdd=to_date,
     )
 
-    return df.tail(10)
+    return df
 
 
 def fetch_company_info(client, code):
