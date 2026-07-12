@@ -1,3 +1,6 @@
+import os
+
+
 def create_stock_report(company_info, stock_data, news=None, moving_averages=None, moving_average_window=25):
     llm_window = 15  # LLMに渡す株価データの件数を制限する
 
@@ -72,6 +75,7 @@ def save_stock_report(report, code, stock_data):
     latest_date = stock_data["Date"].max()
     date = latest_date.strftime("%Y%m%d")
 
+    os.makedirs("reports", exist_ok=True)  # 新規環境でもフォルダ不在で落ちないように
     filename = f"reports/{code}_{date}.md"
 
     with open(filename, "w", encoding="utf-8") as f:
