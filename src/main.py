@@ -15,14 +15,15 @@ def main():
     client = ClientV2()
     stock_code = [code.strip() for code in input().split(',')]
 
+    moving_average_window = 25  # 移動平均線の計算に使用する期間
+
     for code in stock_code:
         stock_data = fetch_stock_data(client, code)
         company_info = fetch_company_info(client, code)
         news = fetch_stock_news(company_info["name"])
         display_result(stock_data, company_info)
-        moving_averages = calculate_moving_averages(stock_data, 25)
-        print(f"25日移動平均: {moving_averages}")  # 仮置き
-        report = create_stock_report(company_info, stock_data, news)
+        moving_averages = calculate_moving_averages(stock_data, moving_average_window)
+        report = create_stock_report(company_info, stock_data, news, moving_averages, moving_average_window)
         save_stock_report(report, code, stock_data)
         analysis_result = analyze_market_data(report)
         if analysis_result is None:

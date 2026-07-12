@@ -22,15 +22,18 @@ def test_calculate_moving_averages_is_correct_algorithm():
     moving_averages = calculate_moving_averages(stock_data, window=3)
 
     # 計算結果の検証
-    expected_moving_averages = pd.Series(
-        [
-            float("NaN"),
-            float("NaN"),
-            (1050 + 1100 + 900) / 3,
-            (1100 + 900 + 1150) / 3,
-            (900 + 1150 + 1200) / 3,
-        ],
-        name="C",
+    expected_moving_averages = pd.DataFrame(
+        {
+            "C": [1050, 1100, 900, 1150, 1200],
+            "MA": [
+                float("NaN"),
+                float("NaN"),
+                (1050 + 1100 + 900) / 3,
+                (1100 + 900 + 1150) / 3,
+                (900 + 1150 + 1200) / 3,
+            ],
+        },
+        index=pd.Index(stock_data["Date"], name="Date"),
     )
-    
-    pd.testing.assert_series_equal(moving_averages, expected_moving_averages)
+
+    pd.testing.assert_frame_equal(moving_averages, expected_moving_averages, check_exact=False)

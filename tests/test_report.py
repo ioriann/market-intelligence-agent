@@ -37,6 +37,11 @@ fractional_price_data = pd.DataFrame({
     "C": [975.33],
 })
 
+moving_averages = pd.DataFrame({
+    "Date": [pd.Timestamp("2026-03-27")],
+    "MA": [102.5],
+    "C": [105],
+}).set_index("Date")
 
 # データ1件だけでもレポートの見出し（会社名・銘柄コード）が正しく作られるかを確認する
 def test_create_stock_report():
@@ -54,8 +59,8 @@ def test_create_stock_report_uses_latest_date_as_created_date():
 def test_create_stock_report_summary_reflects_period_high_low_and_change_rate():
     report = create_stock_report(company_info, multi_day_data)
     # 期間最高値=1200, 期間最安値=950
-    assert "期間最高値: 1,200円" in report
-    assert "期間最安値: 950円" in report
+    assert "期間最高値(過去15日間): 1,200円" in report
+    assert "期間最安値(過去15日間): 950円" in report
     # 騰落率 = (900 - 1050) / 1050 * 100 = -14.29%
     assert "騰落率: -14.29%" in report
 
@@ -99,6 +104,24 @@ def test_create_stock_report_omits_news_section_when_no_news():
     report_with_empty_list = create_stock_report(company_info, stock_data, news=[])
     assert "## 関連ニュース" not in report_with_empty_list
 
+def test_create_stock_report_moving_averages_section_includes_ma_values():
+    report = create_stock_report(company_info, stock_data, moving_averages=moving_averages, moving_average_window=25)
+    assert "## MA25(過去1日間)" in report
+    assert "| 日付 | 終値 | 移動平均 |" in report
+    assert "| 2026-03-27 | 105.0円 | 102.50円 |" in report
+
+# MAがNaNの行（rolling計算の先頭window-1日分）はテーブルに出力しない
+def test_create_stock_report_moving_averages_excludes_nan_rows():
+    moving_averages_with_nan = pd.DataFrame({
+        "Date": [pd.Timestamp("2026-03-26"), pd.Timestamp("2026-03-27")],
+        "MA": [float("nan"), 102.5],
+        "C": [104, 105],
+    }).set_index("Date")
+
+    report = create_stock_report(company_info, stock_data, moving_averages=moving_averages_with_nan, moving_average_window=25)
+    assert "## MA25(過去1日間)" in report
+    assert "2026-03-26" not in report
+    assert "| 2026-03-27 | 105.0円 | 102.50円 |" in report
 
 # save_stock_report() が reports/ に正しいファイル名・内容でファイルを書き出すかを確認する
 # （本番のreports/を汚さないよう、tmp_pathで作った一時ディレクトリに移動してから実行する）

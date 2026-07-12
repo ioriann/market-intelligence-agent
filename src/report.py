@@ -1,5 +1,8 @@
-def create_stock_report(company_info, stock_data, news=None):
+def create_stock_report(company_info, stock_data, news=None, moving_averages=None, moving_average_window=25):
+    llm_window = 15  # LLMに渡す株価データの件数を制限する
 
+    stock_data = stock_data.copy()
+    stock_data = stock_data.tail(llm_window)
     sorted_data = stock_data.sort_values("Date")
 
     earliest_date = sorted_data["Date"].min()
@@ -21,10 +24,10 @@ def create_stock_report(company_info, stock_data, news=None):
     report += f"- 市場: {company_info['market']}\n"
     report += f"- 業種: {company_info['sector']}\n\n"
 
-    report += "## 期間サマリー\n\n"
-    report += f"- 期間: {earliest_date.date()} 〜 {latest_date.date()}\n"
-    report += f"- 期間最高値: {highest:,}円\n"
-    report += f"- 期間最安値: {lowest:,}円\n"
+    report += f"## 期間サマリー(過去{llm_window}日間)\n\n"
+    report += f"- 期間(過去{llm_window}日間): {earliest_date.date()} 〜 {latest_date.date()}\n"
+    report += f"- 期間最高値(過去{llm_window}日間): {highest:,}円\n"
+    report += f"- 期間最安値(過去{llm_window}日間): {lowest:,}円\n"
     report += f"- 騰落率: {change_rate:+.2f}%\n\n"
 
     if news:
@@ -47,6 +50,21 @@ def create_stock_report(company_info, stock_data, news=None):
             f"| {row['C']:,}円 |\n"
         )
 
+    if moving_averages is not None:
+        moving_averages = moving_averages.dropna(subset=["MA"])
+        moving_averages_length = len(moving_averages)
+        report += f"\n## MA{moving_average_window}(過去{moving_averages_length}日間)\n\n"
+        report += "| 日付 | 終値 | 移動平均 |\n"
+        report += "| --- | --- | --- |\n"
+
+        for _, row in moving_averages.iterrows():
+            ma_value = row["MA"]
+            ma_str = f"{ma_value:,.2f}円"
+            report += (
+                f"| {row.name.date()} "
+                f"| {row['C']:,}円 "
+                f"| {ma_str} |\n"
+            )
     return report
 
 def save_stock_report(report, code, stock_data):
