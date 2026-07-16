@@ -57,6 +57,19 @@ def create_stock_report(company_info, stock_data, news=None, moving_averages=Non
         moving_averages = moving_averages.dropna(subset=["MA"])
         moving_averages_length = len(moving_averages)
         report += f"\n## MA{moving_average_window}(過去{moving_averages_length}日間)\n\n"
+        if moving_averages_length > 0:
+            latest = moving_averages.iloc[-1]
+            if latest["C"] > latest["MA"]:
+                position = "上"
+            elif latest["C"] < latest["MA"]:
+                position = "下"
+            else:
+                position = "同値"
+            report += f"- MA{moving_average_window}最新値: {latest['MA']:,.2f}円\n"
+            report += f"- 終値とMA{moving_average_window}の位置関係: 終値がMA{moving_average_window}の{position}\n"
+            if "DR" in moving_averages.columns:
+                report += f"- 乖離率: {latest['DR']:+.2f}%\n"
+            report += "\n"
         report += "| 日付 | 終値 | 移動平均 |\n"
         report += "| --- | --- | --- |\n"
 

@@ -123,6 +123,21 @@ def test_create_stock_report_moving_averages_excludes_nan_rows():
     assert "2026-03-26" not in report
     assert "| 2026-03-27 | 105.0円 | 102.50円 |" in report
 
+# MAセクションの冒頭に「MA最新値・終値との位置関係・乖離率」のサマリーが出ることを確認する
+def test_create_stock_report_moving_averages_summary_shows_position_and_deviation():
+    ma_with_dr = pd.DataFrame({
+        "Date": [pd.Timestamp("2026-03-27")],
+        "C": [105.0],
+        "MA": [100.0],
+        "DR": [5.0],  # (105 - 100) / 100 × 100
+    }).set_index("Date")
+
+    report = create_stock_report(company_info, stock_data, moving_averages=ma_with_dr, moving_average_window=25)
+
+    assert "- MA25最新値: 100.00円" in report
+    assert "- 終値とMA25の位置関係: 終値がMA25の上" in report
+    assert "- 乖離率: +5.00%" in report
+
 # save_stock_report() が reports/ に正しいファイル名・内容でファイルを書き出すかを確認する
 # （本番のreports/を汚さないよう、tmp_pathで作った一時ディレクトリに移動してから実行する）
 def test_save_stock_report_writes_expected_file(tmp_path, monkeypatch):

@@ -3,7 +3,7 @@ from jquantsapi import ClientV2
 
 from fetch_stock import fetch_stock_data, fetch_company_info, display_result
 from report import create_stock_report, save_stock_report
-from indicators import calculate_moving_averages
+from indicators import calculate_moving_averages, add_ma_deviation_rate
 from news import fetch_stock_news
 from ai_analysis import analyze_market_data
 
@@ -23,6 +23,7 @@ def main():
         news = fetch_stock_news(company_info["name"])
         display_result(stock_data, company_info)
         moving_averages = calculate_moving_averages(stock_data, moving_average_window)
+        moving_averages = add_ma_deviation_rate(moving_averages)
         report = create_stock_report(company_info, stock_data, news, moving_averages, moving_average_window)
         save_stock_report(report, code, stock_data)
         analysis_result = analyze_market_data(report)
