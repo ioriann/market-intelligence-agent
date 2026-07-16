@@ -339,7 +339,8 @@
 
 学んだこと
 
-- （Scottが記入。diffを読んで「add_ma_deviation_rate()が.copy()してから列を足すのはなぜか」に答えられたら合格）
+- sys.pathは、Pythonがimport文でモジュールやライブラリを読み込む際に探しに行くディレクトリ（フォルダ）のリスト。リストの先頭に何が入るかは起動方法で変わる（`python src/main.py`ならsrc/、pytestならプロジェクト直下）ため、同じファイルでもimportの書き方が起動方法によって通ったり通らなかったりする
+- add_ma_deviation_rate()が.copy()するのは、入力のDataFrameを変えないため。列の追加はオブジェクトの破壊的変更（mutation）なので、copyしないと呼び出し側の参照からも見えてしまう（副作用）。Pythonの引数渡しの正式名称は共有渡し（call by sharing）で、再代入は呼び出し側に届かないが破壊的変更は届く
 
 困ったこと
 
